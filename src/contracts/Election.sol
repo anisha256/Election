@@ -7,6 +7,7 @@ contract Election {
       uint voteCount;
 
   }
+   //string public name ="hello everyone";
 
   struct Voter{
       bool authorized;
@@ -20,10 +21,38 @@ contract Election {
   Candidate[] public candidates;
   uint public totalVotes;
 
-  function ElectionCons(string memory _name) public {
+  modifier ownerOnly() {
+      require(msg.sender == owner);
+      _;
+  }
+
+  function electionCons(string memory _name) public {
       owner = msg.sender;
       electionName = _name;
   }
-       string public name ="hello everyone";
+
+  function addCandidate(string memory _name)ownerOnly public{
+     candidates.push(Candidate(_name,0));
+  }
+
+  function getNumCandidate( ) public view returns (uint) {
+     return  candidates.length;
+  }  
+
+  function authorize(address _person) ownerOnly public {
+      voters[_person].authorized = true;
+  }
+
+  function vote( uint _voteIndex) public{
+      require(!voters[msg.sender].voted);
+      require(voters[msg.sender].authorized);
+
+      voters[msg.sender].vote =_voteIndex;
+      voters[msg.sender].voted =true;
+
+      candidates[_voteIndex].voteCount +=1;
+      totalVotes +=1;
+  }
+
 
 }
